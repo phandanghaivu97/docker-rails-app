@@ -14,8 +14,8 @@ services:
       dockerfile: Dockerfile
     command: docker/common/wait-for-it.sh db:3306 -- docker/ruby/entrypoint.sh
     volumes:
-      - .:/app # mount data beetwen host and container
-      - bundle:/bundle
+      - .:/myapp
+      - bundle:/myapp/vendor/bundle
     ports:
       - 3000:3000
     env_file: .env
