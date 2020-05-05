@@ -19,6 +19,23 @@ services:
     ports:
       - 3000:3000
     env_file: .env
+  redis:
+    image: redis:5.0.3
+    volumes:
+      - redis-data:/data
+  sidekiq:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: docker/common/wait-for-it.sh redis:6379 -- docker/sidekiq/entrypoint.sh
+    depends_on:
+      - app
+      - redis
+    volumes:
+      - .:/myapp
+      - bundle:/myapp/vendor/bundle
+    env_file: .env
 volumes:
   db-data:
   bundle:
+  redis-data:
