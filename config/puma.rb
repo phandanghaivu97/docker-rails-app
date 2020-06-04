@@ -4,19 +4,19 @@
 # the maximum value specified for Puma. Default is set to 5 threads for minimum
 # and maximum; this matches the default thread size of Active Record.
 #
-threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }
-threads threads_count, threads_count
+## threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }
+## threads threads_count, threads_count
 
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
 #
-port        ENV.fetch("PORT") { 3000 }
+## port        ENV.fetch("PORT") { 3000 }
 
 # Specifies the `environment` that Puma will run in.
 #
-environment ENV.fetch("RAILS_ENV") { "development" }
+## environment ENV.fetch("RAILS_ENV") { "development" }
 
 # Specifies the `pidfile` that Puma will use.
-pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }
+## pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }
 
 # Specifies the number of `workers` to boot in clustered mode.
 # Workers are forked webserver processes. If using threads and workers together
@@ -34,4 +34,31 @@ pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }
 # preload_app!
 
 # Allow puma to be restarted by `rails restart` command.
-plugin :tmp_restart
+## plugin :tmp_restart
+
+#!/usr/bin/env puma
+
+directory '/var/www/docker-rails-app/current'
+rackup "/var/www/docker-rails-app/current/config.ru"
+environment 'dev'
+
+tag ''
+
+pidfile "/var/www/docker-rails-app/shared/tmp/pids/puma.pid"
+state_path "/var/www/docker-rails-app/shared/tmp/pids/puma.state"
+stdout_redirect '/var/www/docker-rails-app/shared/log/puma_access.log', '/var/www/docker-rails-app/shared/log/puma_error.log', true
+
+threads 0,8
+
+bind 'unix:/var/www/docker-rails-app/shared/tmp/sockets/puma.sock'
+
+workers 2
+daemonize true
+
+prune_bundler
+
+
+on_restart do
+  puts 'Refreshing Gemfile'
+  ENV["BUNDLE_GEMFILE"] = ""
+end
